@@ -1,0 +1,47 @@
+:root {
+  --gradient-color-1: #429d7c;
+  --gradient-color-2: #145d62;
+  --primary-text: #0d4245;
+  --secondary-text: #1a5357;
+  --light-text: #689b9e;
+  --button-primary: #ea8e62;
+  --button-secondary: #429d7c;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    var(--gradient-color-1) 0%,
+    var(--gradient-color-2) 121.63%
+  );
+}
+
+.app {
+  min-height: 100vh;
+  background: linear-gradient(
+    180deg,
+    var(--gradient-color-1) 0%,
+    var(--gradient-color-2) 121.63%
+  );
+}
+
+@import "app";
+@import "components/card";
+@import "components/header";
+@import "components/task-form";
+@import "pages/project";
+
+.content {
+  padding: 1rem;
+}

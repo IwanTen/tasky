@@ -1,0 +1,42 @@
+.project-page {
+  padding: 1rem;
+  &__header {
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    &__title {
+      font-size: 3rem;
+      font-weight: 800;
+      color: white;
+      word-wrap: none;
+    }
+    &__form-button {
+      font-size: 1rem;
+      font-weight: 400;
+      border: 2px solid white;
+      border-radius: 4px;
+      padding: 0.2em 0.5em;
+      cursor: pointer;
+    }
+  }
+
+  &__content {
+    padding: 1rem;
+  }
+
+  &__divider {
+    color: #ffffff;
+    border-bottom: 1px solid white;
+    line-height: 50px;
+    display: flex;
+    align-items: center;
+  }
+
+  &__add-button {
+    color: white;
+    width: 1.5rem;
+    height: auto;
+  }
+}

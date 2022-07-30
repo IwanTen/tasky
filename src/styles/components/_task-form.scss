@@ -1,0 +1,107 @@
+.task-form {
+  background: white;
+  border-radius: 6px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+  &__header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    &__title {
+      color: var(--primary-text);
+      font-size: 2rem;
+      font-weight: 600;
+    }
+  }
+  &__form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+  }
+  &__label {
+    color: var(--primary-text);
+    font-weight: 600;
+    margin: 0.3rem;
+  }
+  &__input {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    min-height: 2rem;
+    min-width: 14rem;
+    &:focus-within {
+      outline-color: var(--button-secondary);
+    }
+  }
+  &__buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  &__button {
+    min-width: 6rem;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    background-color: var(--button-primary);
+    color: white;
+    // margin-left: 0.5rem;
+    &--cancel {
+      background-color: var(--button-secondary);
+    }
+    &:hover {
+      opacity: 0.7;
+      transition: 0.2s;
+    }
+  }
+
+  &__step-wrapper {
+    position: relative;
+  }
+  &__clear-step {
+    color: var(--button-secondary);
+    position: absolute;
+    top: 0.5rem;
+    margin-left: 0.3rem;
+    :hover {
+      opacity: 0.7;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+  }
+
+  &__add-step {
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    color: var(--secondary-text);
+    &:hover {
+      opacity: 0.7;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+  }
+  &--hidden {
+    min-height: 0;
+    height: 0;
+    overflow: hidden;
+    transition: 0.2s;
+  }
+}
+
+.attribute-container {
+  // display: inline-flex;
+  label {
+    color: var(--secondary-text);
+  }
+}

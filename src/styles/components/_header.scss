@@ -1,0 +1,10 @@
+.header {
+  min-height: 50px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  &__title {
+    margin: 1rem;
+  }
+}
