@@ -1,6 +1,6 @@
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
   gap: 1rem;
 }
 .card {
@@ -8,38 +8,54 @@
   border-radius: 6px;
   padding: 1rem;
   min-width: 100%;
+  max-width: 100%;
+  word-wrap: break-word;
+
+  // max-width: 300px;
   min-height: 300px;
   justify-self: flex-start;
   &__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
     font-style: italic;
 
     &__title {
       color: var(--primary-text);
+      width: 80%;
     }
   }
   &__info {
     color: var(--secondary-text);
+    font-weight: 600;
   }
   &__step {
     display: flex;
     align-items: center;
-    color: var(--light-text);
+    color: var(--button-primary);
     font-weight: 800;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     margin: 0.5rem;
+    &--completed {
+      color: var(--light-text);
+      font-style: italic;
+      opacity: 0.7;
+      .card__step__text {
+        text-decoration: line-through;
+      }
+    }
     &__number {
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 2px solid var(--light-text);
+      border: 2px solid;
       aspect-ratio: 1/1;
       width: 1.3rem;
       border-radius: 4px;
       margin-right: 0.3em;
+      &:hover {
+        cursor: pointer;
+      }
     }
   }
 

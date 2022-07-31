@@ -1,3 +1,4 @@
+import React from "react";
 import { IoMdClose as CloseIcon } from "react-icons/io";
 
 interface stepData {
@@ -6,11 +7,12 @@ interface stepData {
 }
 
 type Props = {
-  id: string;
+  id: number;
   title: string;
   info: string;
   steps: [stepData];
-  deleteTask: (id: string) => any;
+  deleteTask: (id: number) => any;
+  updateStep: (id: number, idx: number) => any;
 };
 
 const Card: React.FC<Props> = (Props) => {
@@ -18,10 +20,21 @@ const Card: React.FC<Props> = (Props) => {
     Props.deleteTask(Props.id);
   };
 
+  const updateStep = (idx: number) => {
+    Props.updateStep(Props.id, idx);
+  };
+
   const Steps = Props.steps.map((step, index) => {
     return (
-      <div className="card__step" key={index}>
-        <div className="card__step__number">{index + 1}</div>
+      <div
+        className={`card__step ${
+          step.completed ? "card__step--completed" : ""
+        }`}
+        key={index}
+      >
+        <div className="card__step__number" onClick={() => updateStep(index)}>
+          {index + 1}
+        </div>
         <p className="card__step__text">{step.step}</p>
       </div>
     );
@@ -30,9 +43,10 @@ const Card: React.FC<Props> = (Props) => {
     <div className="card">
       <div className="card__header">
         <h2 className="card__header__title">{Props.title}</h2>
+
         <CloseIcon className="close-button" onClick={deleteCard} />
       </div>
-      <p className="card__info">{Props.info}</p>
+      {Props.info.length > 0 && <p className="card__info">{Props.info}</p>}
       {Steps}
     </div>
   );

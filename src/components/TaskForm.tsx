@@ -15,7 +15,7 @@ type Props = {
 
 interface stepData {
   step: string;
-  completed?: Boolean;
+  completed: Boolean;
 }
 
 interface taskData {
@@ -30,15 +30,51 @@ const Create: React.FC<Props> = (Props) => {
     info: "",
     steps: [],
   });
+
+  const [formError, setFormError] = useState({
+    name: false,
+    info: false,
+    steps: false,
+  });
   const [open, setOpen] = useState(false);
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    Props.createTask(data);
+    if (!handleErrors()) {
+      Props.createTask(data);
+      resetForm();
+    }
+  };
+
+  const resetForm = () => {
+    setData({
+      name: "",
+      info: "",
+      steps: [],
+    });
+  };
+
+  const handleErrors = () => {
+    if (data.name.length < 1) {
+      setFormError((prev) => {
+        return {
+          ...prev,
+          name: true,
+        };
+      });
+      return true;
+    }
+    return false;
   };
 
   const handleChange = (e: any) => {
     const { value, name } = e.target;
+    setFormError((prev) => {
+      return {
+        ...prev,
+        [name]: false,
+      };
+    });
     setData((data) => {
       return {
         ...data,
@@ -53,7 +89,7 @@ const Create: React.FC<Props> = (Props) => {
       return {
         ...data,
         steps: data.steps.map((step, idx) => {
-          if (index == idx) return { step: value };
+          if (index == idx) return { step: value, completed: false };
           else return step;
         }),
       };
@@ -84,15 +120,13 @@ const Create: React.FC<Props> = (Props) => {
     data.steps.length > 0
       ? data.steps.map((step, index) => {
           return (
-            <div className="task-form__step-wrapper">
+            <div className="task-form__step-wrapper" key={`step${index}`}>
               <input
                 className="task-form__input"
                 name="steps"
-                key={index}
                 id={`step${index + 1}`}
                 placeholder={`what is step ${index + 1}?`}
                 type="text"
-                defaultValue="default"
                 value={String(data.steps[index].step)}
                 onChange={(event) => handleStepChange(event, index)}
               />
@@ -105,9 +139,10 @@ const Create: React.FC<Props> = (Props) => {
         })
       : null;
 
-  useEffect(() => {
-    console.log(data.steps);
-  }, [data]);
+  // useEffect(() => {
+  //   console.log(data);
+  // }, [data]);
+
   return (
     <div
       className={`task-form ${
@@ -128,11 +163,14 @@ const Create: React.FC<Props> = (Props) => {
           id="task-name"
           placeholder="what do you need to do?"
           type="text"
-          defaultValue="default"
           value={data.name}
           onChange={handleChange}
         />
-
+        {formError.name && (
+          <div className="task-form__error">
+            {"you must provide a task name!"}
+          </div>
+        )}
         <label htmlFor="task-info" className="task-form__label">
           {"description"}
         </label>
@@ -144,24 +182,20 @@ const Create: React.FC<Props> = (Props) => {
           value={data.info}
           onChange={handleChange}
         ></textarea>
-        {
-          //*TODO add step mechanics
-        }
         {StepInputs}
         <div className="task-form__add-step" onClick={addStep}>
           {"add step"}
           <AddStepIcon />
         </div>
-
         <div className="task-form__buttons">
           <button
             className="task-form__button task-form__button--cancel"
             onClick={() => Props.closeForm()}
           >
-            cancel
+            {"cancel"}
           </button>
           <button className="task-form__button task-form__button--submit">
-            add task
+            {"add task"}
           </button>
         </div>
       </form>

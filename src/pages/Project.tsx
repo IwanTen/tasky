@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import Header from "../components/Header";
 import Card from "../components/Card";
 import TaskForm from "../components/TaskForm";
-import { IoAdd as AddTaskButton } from "react-icons/io5";
+import { MdAdd as AddTaskButton } from "react-icons/md";
+import idb, { openDB, DBSchema } from "idb";
 import "../styles/style.css";
 
 type Props = {};
@@ -13,7 +13,6 @@ interface stepData {
 }
 
 interface taskData {
-  // id: number;
   name: string;
   info: string;
   steps: stepData[];
@@ -21,25 +20,16 @@ interface taskData {
 
 const apiUrl = "/api/v1/tasks";
 
-let db: any;
-
 const App = (props: Props) => {
-  const [cardData, setCardData] = useState<any[]>([]);
+  const storeName = "TaskStore";
+  const [taskData, setTaskData] = useState<any[]>([]);
   const [formIsOpen, setFormIsOpen] = useState<Boolean>(true);
-  // const [idxDb, setidxDb] = useState<any>(null);
 
-  let dummyTask: taskData = {
-    // id: 1,
-    name: "test task",
-    info: "test info",
-    steps: [
-      { step: "test step 1", completed: false },
-      { step: "test step 1", completed: false },
-    ],
-  };
+  // useEffect(() => {
+  //   console.log("taskData", taskData);
+  // }, [taskData]);
 
   useEffect(() => {
-    // fetchAllTasks();
     if (!window.indexedDB) {
       console.log(
         "Your browser doesn't support a stable version of IndexedDB. Such and such feature will not be available."
@@ -49,80 +39,99 @@ const App = (props: Props) => {
     }
   }, []);
 
-  const initIndexDb = () => {
-    console.log("open index db function called");
-    const openRequest = window.indexedDB.open("testTaskdb", 3);
-    let dbRef;
-    openRequest.onupgradeneeded = () => {
-      let db = openRequest.result;
-      if (!db.objectStoreNames.contains("tasks")) {
-      }
-      db.createObjectStore("tasks", { keyPath: "id", autoIncrement: true });
-      console.log("object store created");
-    };
-
-    openRequest.onsuccess = function (e: any) {
-      if (e.target != null) {
-        dbRef = e.target.result;
-        console.log(e.target.result);
-      }
-    };
-    openRequest.onerror = function (e: any) {
-      console.error("Error", e.target.error);
-      dbRef = null;
-    };
-
-    return dbRef;
+  const initIndexDb = async () => {
+    try {
+      let db = await openDB(storeName, 3, {
+        upgrade(db) {
+          if (!db.objectStoreNames.contains("tasks")) {
+            db.createObjectStore("tasks", {
+              keyPath: "id",
+              autoIncrement: true,
+            });
+          }
+        },
+      });
+      let allTasks = await db.getAll("tasks");
+      setTaskData(allTasks);
+    } catch (err) {
+      console.log("error initializing database", err);
+      setTaskData([]);
+    }
   };
 
-  // const addTaskToIndexDb = () => {
-  //   console.log("add indexdb task function called");
-  //   let db = initIndexDb;
-  //   if (db != null) {
-  //     let transaction = db.transaction("tasks", "readwrite");
-  //     let tasks = transaction.objectStore("tasks");
-  //     let request = tasks.add(dummyTask);
-  //     request.onsuccess = function () {
-  //       console.log("task added to the store", request);
-  //     };
-  //     request.onerror = function () {
-  //       console.log("Error", request.error);
-  //     };
-  //   }
-  // };
+  const addTaskToIndexDb = async (data: taskData) => {
+    try {
+      let db = await openDB(storeName, 3, {
+        upgrade(db) {
+          if (!db.objectStoreNames.contains("tasks")) {
+            db.createObjectStore("tasks", {
+              keyPath: "id",
+              autoIncrement: true,
+            });
+          }
+        },
+      });
+      await db.add("tasks", data);
+      await initIndexDb();
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-  const setDummyLocalData = () => {};
+  const deleteTaskFromIndexDb = async (id: number) => {
+    let db = await openDB(storeName, 3, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains("tasks")) {
+          db.createObjectStore("tasks", { keyPath: "id", autoIncrement: true });
+        }
+      },
+    });
 
-  // const fetchAllTasksfromIndexDb = () => {
-  //   console.log("fetch all idxDb tasks function called");
-  //   if (idxDb != null) {
-  //     let transaction = idxDb.transaction("tasks", "readwrite");
-  //     let tasks = transaction.objectStore("tasks");
-  //     let request = tasks.getAll();
-  //     request.onsuccess = () => {
-  //       setCardData(request.result);
-  //     };
-  //     request.onerror = (err: any) => {
-  //       console.error(`Error to get all students: ${err}`);
-  //     };
-  //   } else {
-  //     console.log("db ref was null");
-  //   }
-  // };
+    await db.delete("tasks", id);
+    initIndexDb();
+  };
+
+  const updateTaskInIndexDb = async (id: number, idx: number) => {
+    let item = taskData.find((task) => task.id == id);
+    console.log("item", item);
+
+    let step = item.steps.map((step: stepData, index: number) => {
+      if (index == idx) step.completed = !step.completed;
+      return step;
+    });
+    console.log("step ", step);
+    const updatedItem = { ...item, steps: step };
+
+    try {
+      let db = await openDB(storeName, 3, {
+        upgrade(db) {
+          if (!db.objectStoreNames.contains("tasks")) {
+            db.createObjectStore("tasks", {
+              keyPath: "id",
+              autoIncrement: true,
+            });
+          }
+        },
+      });
+      await db.put("tasks", updatedItem);
+      await initIndexDb();
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   let Cards;
-  if (cardData) {
-    Cards = cardData.map((card) => {
+  if (taskData) {
+    Cards = taskData.map((task) => {
       return (
         <Card
-          title={card.name}
-          info={card.info}
-          steps={card.steps}
-          id={card._id}
-          key={card._id}
-          deleteTask={() => {
-            console.log("delete tasks");
-          }}
+          title={task.name}
+          info={task.info}
+          steps={task.steps}
+          id={task.id}
+          key={task.id}
+          deleteTask={deleteTaskFromIndexDb}
+          updateStep={updateTaskInIndexDb}
         />
       );
     });
@@ -143,21 +152,14 @@ const App = (props: Props) => {
         />
       </div>
       <div className="project-page__content">
-        {/**
-         * //TODO retrieve test data from localdb then add form and
-         * //TODO implement create and delete functions
-         */}
-
-        {/* <TaskForm
+        <TaskForm
           formOpen={formIsOpen}
-          createTask={createTask}
+          createTask={addTaskToIndexDb}
           closeForm={() => {
             setFormIsOpen(false);
           }}
-        /> */}
+        />
         <div className="cards">{Cards}</div>
-        {/* <button onClick={() => addTaskToIndexDb()}>add task</button> */}
-        {/* <button onClick={() => fetchAllTasksfromIndexDb()}>fetch data</button> */}
       </div>
     </div>
   );
@@ -165,43 +167,13 @@ const App = (props: Props) => {
 
 export default App;
 
-// const createTask = (incomingData: any) => {
-//   console.log("create task input data:" + JSON.stringify(incomingData));
-//   fetch("/api/v1/tasks", {
-//     method: "POST",
-//     headers: {
-//       Accept: "application/json",
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify({
-//       name: incomingData.name,
-//       info: incomingData.info,
-//       steps: incomingData.steps,
-//     }),
-//   })
-//     .then((res) => {
-//       if (!res.ok) {
-//         return catchError(res);
-//       } else {
-//         res.json().then((data) => {
-//           console.log(data);
-//           setCardData((prev) => {
-//             return [...prev, data.task];
-//           });
-//         });
+// const clearAllIndexDbTasks = async () => {
+//   let db = await openDB(storeName, 3, {
+//     upgrade(db) {
+//       if (!db.objectStoreNames.contains("tasks")) {
+//         db.createObjectStore("tasks", { keyPath: "id", autoIncrement: true });
 //       }
-//     })
-//     .catch(catchError);
-// };
-
-// const deleteTask = (id: string) => {
-//   fetch(`/api/v1/tasks/${id}`, {
-//     method: "delete",
-//   })
-//     .then((res) => res.json())
-//     .then((res) => {
-//       setCardData((data) => data.filter((card) => card._id !== id));
-//       console.log(`${res.task} successfully deleted!`);
-//     })
-//     .catch((err) => console.log(err));
+//     },
+//   });
+//   await db.clear("tasks");
 // };

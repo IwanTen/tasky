@@ -6,6 +6,7 @@
   flex-direction: column;
   align-items: center;
   margin-bottom: 1rem;
+  transition: 0.2s;
   &__header {
     width: 100%;
     display: flex;
@@ -40,13 +41,16 @@
       outline-color: var(--button-secondary);
     }
   }
+  &__error {
+    color: var(--button-primary);
+    font-size: 0.9rem;
+  }
   &__buttons {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
     margin-top: 1rem;
   }
-
   &__button {
     min-width: 6rem;
     padding: 0.5rem;
@@ -95,6 +99,7 @@
     min-height: 0;
     height: 0;
     overflow: hidden;
+    opacity: 0;
     transition: 0.2s;
   }
 }
